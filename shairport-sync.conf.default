@@ -1,0 +1,17 @@
+general =
+{
+        name = "HiFiBerry";
+        disable_standby_mode = "auto";
+        volume_control_profile = "flat";
+}
+alsa =
+{
+        mixer_control_name = "Digital";
+}
+sessioncontrol =
+{
+        run_this_before_play_begins = "curl -X POST http://172.17.0.1:81/api/player/stop-all/shairport-sync";
+        wait_for_completion = "yes";
+        allow_session_interruption = "yes";
+        session_timeout = 20;
+}

@@ -1,0 +1,34 @@
+#!/bin/sh
+cd `dirname $0`
+. /etc/hifiberry.state
+
+if [ ! -f /etc/dbus-1/system.d/shairport-sync.conf ]; then
+
+cat <<EOF >/etc/dbus-1/system.d/shairport-sync.conf
+<!-- This configuration file specifies the required security policies
+     for Bluetooth core daemon to work. -->
+
+<!DOCTYPE busconfig PUBLIC "-//freedesktop//DTD D-BUS Bus Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd">
+<busconfig>
+  <policy user="root">
+    <allow own="org.mpris.MediaPlayer2.ShairportSync"/>
+    <allow own="org.gnome.ShairportSync"/>
+  </policy>
+  <policy user="player">
+    <allow own="org.mpris.MediaPlayer2.ShairportSync"/>
+    <allow own="org.gnome.ShairportSync"/>
+  </policy>
+</busconfig>
+EOF
+systemctl restart dbus
+
+fi
+
+# Create default configuration
+if [ ! -f /etc/shairport-sync.conf ]; then
+ cp /data/extensions/shairport/shairport-sync.conf.default /etc/shairport-sync.conf
+fi
+
+# Make sure the use the correct command to pause other players
+sed -i 's|\(run_this_before_play_begins = \).*|\1"curl -X POST http://172.17.0.1:81/api/player/stop-all/shairport-sync";|' /etc/shairport-sync.conf
