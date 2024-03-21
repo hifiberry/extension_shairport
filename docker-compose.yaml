@@ -12,7 +12,6 @@ services:
         max-size: "1m"
         max-file: "5"  
 
-
   shairport-sync:
     container_name: shairport-sync
     restart: always

@@ -160,7 +160,7 @@ var fetch = require("node-fetch"); // for sending HTTP requests to the DACP serv
 		}
 		
 		if (event.header == "shairportSyncEnabled") {
-			
+
 			if (event.content.enabled != undefined) {
 				setShairportSyncStatus(event.content.enabled, function(newStatus, error) {
 					beo.bus.emit("ui", {target: "shairport-sync", header: "configuration", content: {shairportSyncEnabled: newStatus}});
@@ -182,7 +182,7 @@ var fetch = require("node-fetch"); // for sending HTTP requests to the DACP serv
 	});
 	
 	function getShairportSyncStatus(callback) {
-		exec("systemctl is-active --quiet shairport-sync.service").on('exit', function(code) {
+		exec("/opt/hifiberry/bin/extensions running shairport").on('exit', function(code) {
 			if (code == 0) {
 				shairportSyncEnabled = true;
 				callback(true);
@@ -195,7 +195,7 @@ var fetch = require("node-fetch"); // for sending HTTP requests to the DACP serv
 	
 	function setShairportSyncStatus(enabled, callback) {
 		if (enabled) {
-			exec("systemctl enable --now shairport-sync.service").on('exit', function(code) {
+			exec("/opt/hifiberry/bin/extensions start shairport").on('exit', function(code) {
 				if (code == 0) {
 					shairportSyncEnabled = true;
 					if (debug) console.log("Shairport-sync enabled.");
@@ -206,7 +206,7 @@ var fetch = require("node-fetch"); // for sending HTTP requests to the DACP serv
 				}
 			});
 		} else {
-			exec("systemctl disable --now shairport-sync.service").on('exit', function(code) {
+			exec("/opt/hifiberry/bin/extensions stop shairport").on('exit', function(code) {
 				shairportSyncEnabled = false;
 				if (code == 0) {
 					callback(false);
@@ -234,7 +234,7 @@ var fetch = require("node-fetch"); // for sending HTTP requests to the DACP serv
 			}
 			writeShairportSyncConfiguration();
 			if (relaunch && shairportSyncEnabled) {
-				exec("systemctl restart shairport-sync.service", function(error, stdout, stderr) {
+				exec("/opt/hifiberry/bin/restart shairport-sync", function(error, stdout, stderr) {
 					if (error) {
 						if (debug) console.error("Relaunching shairport-sync failed: "+error);
 					} else {
