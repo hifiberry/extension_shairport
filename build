@@ -1,0 +1,5 @@
+#!/bin/sh
+docker system prune -a
+docker build -t shairport-sync -f Dockerfile.shairport-sync .
+docker build -t nqptp -f Dockerfile.nqptp .
+
