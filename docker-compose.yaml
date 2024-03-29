@@ -2,7 +2,7 @@ version: '3'
 services:
   nqptp:
     container_name: nqptp
-    image: ghcr.io/hifiberry/extension_nqptp:latest
+    image: ghcr.io/hifiberry/extension_shairport-nqptp:1.2.5.18
     #build:
     #  context: .
     #  dockerfile: Dockerfile.nqptp
@@ -15,9 +15,9 @@ services:
   shairport-sync:
     container_name: shairport-sync
     restart: always
-    #image: ghcr.io/hifiberry/extension_shairport-sync:latest
-    build:
-      dockerfile: Dockerfile.shairport-sync
+    image: ghcr.io/hifiberry/extension_shairport-sync:4.3.2.2
+    #build:
+    #  dockerfile: Dockerfile.shairport-sync
     depends_on: 
       - nqptp
     network_mode: host
