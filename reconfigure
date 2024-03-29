@@ -1,0 +1,49 @@
+#!/bin/python 
+
+import os
+import fileinput
+
+def replace_line(filepath, search_text, replace_text):
+    # Iterate over the file and replace lines matching search_text with replace_text
+    for line in fileinput.input(filepath, inplace=True):
+        if line.startswith(search_text) or line.lstrip().startswith(search_text):
+            print(replace_text)
+        else:
+            print(line, end='')
+
+def load_config(filepath):
+    if not os.path.isfile(filepath):
+        print(f"Configuration file '{filepath}' not found")
+        return {}
+
+    config = {}
+    with open(filepath, 'r') as file:
+        for line in file:
+            line = line.strip()
+            if line:
+                key, value = line.split('=', 1)
+                config[key.strip()] = value.strip().strip('"');
+    return config
+
+def reconfigure():
+    # Load configuration values from file
+    config = load_config('/etc/hifiberry.state')
+
+    # Reconfigure Shairport-sync
+    if not os.path.isfile('/etc/shairport-sync.conf'):
+        print("shairport-sync.conf not found")
+        return
+
+    # Replace lines in /etc/shairport-sync.conf
+    replace_line('/etc/shairport-sync.conf', 'mixer_control_name = ', '        mixer_control_name = "' + config.get("CURRENT_MIXER_CONTROL", "") + '";')
+    replace_line('/etc/shairport-sync.conf', 'name = ', '        name = "' + config.get("CURRENT_SYSNAME", "") + '";')
+
+    # Print status messages
+    if config.get('MIXER_CONTROL') != config.get('CURRENT_MIXER_CONTROL'):
+        print("updated mixer")
+
+    if config.get('SYSNAME') != config.get('CURRENT_SYSNAME'):
+        print("updated system name")
+
+if __name__ == "__main__":
+    reconfigure()
