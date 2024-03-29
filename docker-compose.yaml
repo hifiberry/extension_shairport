@@ -1,0 +1,38 @@
+version: '3'
+services:
+  nqptp:
+    container_name: nqptp
+    image: ghcr.io/hifiberry/extension_nqptp:latest
+    #build:
+    #  context: .
+    #  dockerfile: Dockerfile.nqptp
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "5"  
+
+  shairport-sync:
+    container_name: shairport-sync
+    restart: always
+    #image: ghcr.io/hifiberry/extension_shairport-sync:latest
+    build:
+      dockerfile: Dockerfile.shairport-sync
+    depends_on: 
+      - nqptp
+    network_mode: host
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    devices:
+      - /dev/snd:/dev/snd
+    volumes:
+      - /etc/shairport-sync.conf:/etc/shairport-sync.conf
+      - /etc/asound.conf:/etc/asound.conf
+      - /run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket
+    group_add:
+      - 2001
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "5"

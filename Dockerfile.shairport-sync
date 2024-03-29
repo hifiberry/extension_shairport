@@ -1,0 +1,66 @@
+# Stage 1: Builder 
+FROM alpine:latest AS builder
+
+# Install required build dependencies
+RUN apk add --no-cache \
+    build-base \
+    autoconf \
+    automake \
+    libtool \
+    libdaemon-dev \
+    popt-dev \
+    libconfig-dev \
+    avahi-dev \
+    dbus-dev \
+    alsa-lib-dev \
+    openssl-dev \
+    glib-dev \
+    git
+
+# Clone shairport-sync repository
+RUN git clone https://github.com/mikebrady/shairport-sync.git /shairport-sync
+
+# Set working directory
+WORKDIR /shairport-sync
+
+# Configure and build shairport-sync
+RUN autoreconf -i -f && \
+    ./configure --sysconfdir=/etc \
+                --with-metadata \
+                --with-stdout \
+                --with-alsa \
+                --with-stdout \
+                --with-avahi \
+                --with-ssl=openssl \
+                --with-mpris-interface && \
+    make
+
+# Stage 2: Create smaller production container
+FROM alpine:latest
+
+RUN apk add --no-cache \
+    libconfig \
+    avahi-libs \
+    dbus \
+    alsa-lib \
+    openssl \
+    glib \
+    popt \
+    curl
+
+RUN addgroup -S shairport && adduser -S -G shairport -u 2002 shairport
+
+# Copy the compiled binary from the builder stage
+COPY --from=builder /shairport-sync/shairport-sync /usr/local/bin/shairport-sync
+
+# Clean up unnecessary files
+RUN rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
+
+# Expose the port used by shairport-sync
+EXPOSE 5000
+
+# Set the entry point to start shairport-sync
+ENTRYPOINT ["shairport-sync", "-v"]
+
+USER shairport
+
