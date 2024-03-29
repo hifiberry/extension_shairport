@@ -1,39 +1,37 @@
-# Stage 1: Build Shairport Sync
-FROM debian:stable-slim AS builder
+# Stage 1: Build Nqptp
+FROM alpine:latest AS builder
 
 # Install required build dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
+RUN apk update && \
+    apk add --no-cache \
+    build-base \
     autoconf \
     automake \
-    git
+    git \
+    linux-headers
 
-# Clone shairport-sync repository
-RUN git clone https://github.com/mikebrady/nqptp.git nqptp
+# Clone Nqptp repository
+RUN git clone https://github.com/mikebrady/nqptp.git /nqptp
 
 # Set working directory
 WORKDIR /nqptp
 
-# Configure and build shairport-sync
+# Configure and build Nqptp
 RUN autoreconf -i -f && \
     ./configure && \
     make
 
 # Stage 2: Create smaller production container
-FROM debian:stable-slim
-
-RUN apt-get update && \
-    apt-get install -yqq --no-install-recommends && \
-    rm -rf /var/lib/apt/lists/* 
+FROM alpine:latest
 
 # Copy the compiled binary from the builder stage
 COPY --from=builder /nqptp/nqptp /usr/local/bin/nqptp
 
 # Clean up unnecessary files
-RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN rm -rf /var/cache/apk/* /tmp/*
 
-# Expose the port used by shairport-sync
+# Expose the port used by Nqptp
 EXPOSE 123
 
-# Set the entry point to start shairport-sync
+# Set the entry point to start Nqptp
 ENTRYPOINT ["nqptp"]
