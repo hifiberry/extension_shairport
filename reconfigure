@@ -2,6 +2,10 @@
 
 import os
 import fileinput
+import shutil
+import errno
+import grp
+import stat
 
 def replace_line(filepath, search_text, replace_text):
     # Iterate over the file and replace lines matching search_text with replace_text
@@ -25,6 +29,31 @@ def load_config(filepath):
                 config[key.strip()] = value.strip().strip('"');
     return config
 
+def create_directory_with_user_group_and_permissions(directory_path, user_id, group_name):
+    try:
+        # Create the directory if it does not exist
+        os.makedirs(directory_path, exist_ok=True)
+        print(f"Directory '{directory_path}' created successfully.")
+
+        # Look up the GID for the group
+        gid = grp.getgrnam(group_name).gr_gid
+
+        # Change the ownership of the directory to user_id and group_id
+        os.chown(directory_path, user_id, gid)
+        print(f"Changed ownership of '{directory_path}' to user ID {user_id} and group '{group_name}'.")
+
+        # Set directory permissions to read, write, and execute for user and group
+        current_permissions = stat.S_IMODE(os.stat(directory_path).st_mode)
+        os.chmod(directory_path, current_permissions | stat.S_IRWXU | stat.S_IRWXG)
+    except KeyError:
+        print(f"Group '{group_name}' not found.")
+    except OSError as e:
+        if e.errno == errno.EEXIST:
+            print(f"Directory '{directory_path}' already exists.")
+        else:
+            printf("Error creating/changing '{directory_path}'")
+
+
 def reconfigure():
     # Load configuration values from file
     config = load_config('/etc/hifiberry.state')
@@ -44,6 +73,11 @@ def reconfigure():
 
     if config.get('SYSNAME') != config.get('CURRENT_SYSNAME'):
         print("updated system name")
+
+    directory_path = "/tmp/shairport-sync"
+    user_id = 2002
+    group_name = "audio"
+    create_directory_with_user_group_and_permissions(directory_path, user_id, group_name)
 
 if __name__ == "__main__":
     reconfigure()
