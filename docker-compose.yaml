@@ -1,25 +1,11 @@
-version: '3'
+version: '3.7'
 services:
-  nqptp:
-    container_name: nqptp
-    image: ghcr.io/hifiberry/extension_shairport-nqptp:1.2.5.18
-    #build:
-    #  context: .
-    #  dockerfile: Dockerfile.nqptp
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "1m"
-        max-file: "5"  
-
   shairport-sync:
     container_name: shairport-sync
     restart: always
-    image: ghcr.io/hifiberry/extension_shairport-sync:4.3.2.3
-    #build:
-    #  dockerfile: Dockerfile.shairport-sync
-    depends_on: 
-      - nqptp
+    #image: ghcr.io/hifiberry/extension_shairport-sync:4.3.2.x
+    build:
+      dockerfile: Dockerfile.shairport-sync
     network_mode: host
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -32,6 +18,8 @@ services:
       - /run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket
     group_add:
       - 2001
+    cap_add:
+      - NET_BIND_SERVICE
     logging:
       driver: "json-file"
       options:

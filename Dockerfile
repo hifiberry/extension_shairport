@@ -41,6 +41,22 @@ RUN autoreconf -i -f && \
                 --with-mpris-interface && \
     make
 
+
+# Clone Nqptp repository
+WORKDIR /
+RUN git clone https://github.com/mikebrady/nqptp.git /nqptp
+
+# Set working directory
+WORKDIR /nqptp
+
+# Configure and build Nqptp
+RUN autoreconf -i -f && \
+    ./configure && \
+    make
+
+# Stage 2: Create smaller production container
+FROM alpine:latest
+
 # Stage 2: Create smaller production container
 FROM alpine:latest
 
@@ -57,12 +73,19 @@ RUN apk add --no-cache \
     libsodium \
     libgcrypt \
     ffmpeg \
-    util-linux
+    util-linux \
+    libcap
 
 RUN addgroup -S shairport && adduser -S -G shairport -u 2002 shairport
 
 # Copy the compiled binary from the builder stage
 COPY --from=builder /shairport-sync/shairport-sync /usr/local/bin/shairport-sync
+COPY --from=builder /nqptp/nqptp /usr/local/bin/nqptp
+RUN setcap 'cap_net_bind_service=+ep' /usr/local/bin/nqptp
+COPY docker/run.sh /run.sh
+COPY docker/pause-others.sh /pause-others.sh
+
+RUN apk add --no-cache libcap
 
 # Clean up unnecessary files
 RUN rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
@@ -70,8 +93,11 @@ RUN rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
 # Expose the port used by shairport-sync
 EXPOSE 5000
 
+# Expose the port used by Nqptp
+EXPOSE 123
+
 # Set the entry point to start shairport-sync
-ENTRYPOINT ["shairport-sync", "-v"]
+ENTRYPOINT ["/run.sh"]
 
 USER shairport
 
