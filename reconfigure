@@ -64,8 +64,9 @@ def reconfigure():
         return
 
     # Replace lines in /etc/shairport-sync.conf
-    replace_line('/etc/shairport-sync.conf', 'mixer_control_name = ', '        mixer_control_name = "' + config.get("CURRENT_MIXER_CONTROL", "") + '";')
-    replace_line('/etc/shairport-sync.conf', 'name = ', '        name = "' + config.get("CURRENT_SYSNAME", "") + '";')
+    replace_line('/etc/shairport-sync.conf', 'mixer_control_name = ', '    mixer_control_name = "' + config.get("CURRENT_MIXER_CONTROL", "") + '";')
+    replace_line('/etc/shairport-sync.conf', 'name = ', '    name = "' + config.get("CURRENT_SYSNAME", "") + '";')
+    replace_line('/etc/shairport-sync.conf', 'run_this_before_play_begins = ', '    run_this_before_play_begins = "/pause-others.sh";')
 
     # Print status messages
     if config.get('MIXER_CONTROL') != config.get('CURRENT_MIXER_CONTROL'):
