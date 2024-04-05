@@ -15,7 +15,12 @@ RUN apk add --no-cache \
     alsa-lib-dev \
     openssl-dev \
     glib-dev \
-    git
+    git \
+    libplist-dev \
+    libsodium-dev \
+    libgcrypt-dev 
+
+RUN apk add ffmpeg-dev  vim
 
 # Clone shairport-sync repository
 RUN git clone https://github.com/mikebrady/shairport-sync.git /shairport-sync
@@ -32,6 +37,7 @@ RUN autoreconf -i -f && \
                 --with-stdout \
                 --with-avahi \
                 --with-ssl=openssl \
+                --with-airplay-2 \
                 --with-mpris-interface && \
     make
 
@@ -46,7 +52,12 @@ RUN apk add --no-cache \
     openssl \
     glib \
     popt \
-    curl
+    curl \
+    libplist \
+    libsodium \
+    libgcrypt \
+    ffmpeg \
+    util-linux
 
 RUN addgroup -S shairport && adduser -S -G shairport -u 2002 shairport
 
