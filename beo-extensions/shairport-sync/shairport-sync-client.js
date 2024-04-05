@@ -15,14 +15,6 @@ $(document).on("shairport-sync", function(event, data) {
 				$("#shairport-sync-change-password").addClass("disabled");
 			}
 		}
-		if (data.content.version != undefined) {
-			if (data.content.version) {
-				$(".shairport-sync-version").text(data.content.version);
-				$(".shairport-sync-version-container").removeClass("hidden");
-			} else {
-				$(".shairport-sync-version-container").addClass("hidden");
-			}
-		}
 		if (data.content.shairportSyncEnabled != undefined) {
 			if (data.content.shairportSyncEnabled) {
 				shairportSyncEnabled = true;
@@ -34,9 +26,6 @@ $(document).on("shairport-sync", function(event, data) {
 			beo.notify(false, "shairport-sync");
 		}
 	}
-
-	
-	
 });
 
 function toggleEnabled() {
