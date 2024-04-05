@@ -15,7 +15,7 @@ services:
   shairport-sync:
     container_name: shairport-sync
     restart: always
-    image: ghcr.io/hifiberry/extension_shairport-sync:4.3.2.2
+    image: ghcr.io/hifiberry/extension_shairport-sync:4.3.2.3
     #build:
     #  dockerfile: Dockerfile.shairport-sync
     depends_on: 
@@ -26,6 +26,7 @@ services:
     devices:
       - /dev/snd:/dev/snd
     volumes:
+      - /tmp/shairport-sync:/tmp/shairport-sync
       - /etc/shairport-sync.conf:/etc/shairport-sync.conf
       - /etc/asound.conf:/etc/asound.conf
       - /run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket
