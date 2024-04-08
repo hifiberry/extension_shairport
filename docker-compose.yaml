@@ -3,9 +3,9 @@ services:
   shairport-sync:
     container_name: shairport-sync
     restart: always
-    #image: ghcr.io/hifiberry/extension_shairport-sync:4.3.2.x
+    image: ghcr.io/hifiberry/extension_shairport-sync:4.3.2.4
     build:
-      dockerfile: Dockerfile.shairport-sync
+      dockerfile: Dockerfile
     network_mode: host
     extra_hosts:
       - "host.docker.internal:host-gateway"
