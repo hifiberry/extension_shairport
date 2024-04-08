@@ -51,7 +51,7 @@ def create_directory_with_user_group_and_permissions(directory_path, user_id, gr
         if e.errno == errno.EEXIST:
             print(f"Directory '{directory_path}' already exists.")
         else:
-            printf("Error creating/changing '{directory_path}'")
+            print(f"Error creating/changing '{directory_path}'")
 
 
 def reconfigure():
