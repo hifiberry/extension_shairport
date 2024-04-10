@@ -103,11 +103,11 @@ beo.bus.on('shairport-sync', function (event) {
 
 		beo.bus.emit("ui", { target: "shairport-sync", header:"configuration", content: { usesPassword: event.content.password != false } });
 
-		restartExtension(hbosextensionName, (success, error) => {
-			if (error) {
+		restartExtension(hbosextensionName, (success) => {
+			if (! success) {
 			  console.error("Failed to restart the service:", error);
 			  beo.bus.emit("ui", { target: "shairport-sync", header: "serviceRestartError" });
-			  return; // Exit if unable to restart the service
+			  return;
 			}
 
 			console.log("Service restarted successfully.");
