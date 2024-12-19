@@ -15,3 +15,6 @@ sessioncontrol =
         allow_session_interruption = "yes";
         session_timeout = 20;
 }
+docker = {
+ airplay2 = "no"
+}

@@ -1,5 +1,14 @@
 #!/bin/sh
-docker system prune -a
-docker build -t shairport-sync -f Dockerfile.shairport-sync .
-docker build -t nqptp -f Dockerfile.nqptp .
+VERSION=$1
+if [ "$VERSION" == "" ]; then
+ if [ -f version ]; then
+  VERSION=`cat version`
+ else
+  echo "run with $0 version_tag"
+  exit 1
+ fi
+fi
+echo "Buidling docker container for version $VERSION"
+docker system prune -a -f
+docker build -t shairport-sync:$VERSION -f Dockerfile .
 

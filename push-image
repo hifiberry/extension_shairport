@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# Move to the directory where the script is located
+cd `dirname $0`
+
+# Get the image ID from the first argument
+IMAGEID=$1
+
+# Ensure IMAGEID is not empty
+if [ -z "$IMAGEID" ]; then
+  echo "Error: Image ID must not be empty."
+  exit 1
+fi
+
+# Read the version from the version file
+VERSION=`cat version`
+
+# Ensure VERSION is not empty
+if [ -z "$VERSION" ]; then
+  echo "Error: Version must not be empty."
+  exit 1
+fi
+
+# Tag and push the Docker image
+docker tag $IMAGEID ghcr.io/hifiberry/extension_shairport-sync:$VERSION
+docker push ghcr.io/hifiberry/extension_shairport-sync:$VERSION

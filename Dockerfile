@@ -23,7 +23,7 @@ RUN apk add --no-cache \
 RUN apk add ffmpeg-dev  vim
 
 # Clone shairport-sync repository
-RUN git clone https://github.com/mikebrady/shairport-sync.git /shairport-sync
+RUN git clone --branch=4.3.5 https://github.com/mikebrady/shairport-sync.git /shairport-sync
 
 # Set working directory
 WORKDIR /shairport-sync
@@ -39,7 +39,20 @@ RUN autoreconf -i -f && \
                 --with-ssl=openssl \
                 --with-airplay-2 \
                 --with-mpris-interface && \
-    make
+    make && \ 
+    cp shairport-sync /shairport-sync-2
+RUN make clean && \
+    ./configure --sysconfdir=/etc \
+                --with-metadata \
+                --with-stdout \           
+                --with-alsa \
+                --with-stdout \
+                --with-avahi \
+                --with-ssl=openssl \
+                --with-mpris-interface && \
+    make && \
+    cp shairport-sync /shairport-sync-classic
+     
 
 
 # Clone Nqptp repository
@@ -74,12 +87,16 @@ RUN apk add --no-cache \
     libgcrypt \
     ffmpeg \
     util-linux \
-    libcap
+    libcap \
+    pipewire-libs \
+    pipewire-alsa \
+    sox
 
 RUN addgroup -S shairport && adduser -S -G shairport -u 2002 shairport
 
 # Copy the compiled binary from the builder stage
-COPY --from=builder /shairport-sync/shairport-sync /usr/local/bin/shairport-sync
+COPY --from=builder /shairport-sync-2 /usr/local/bin/shairport-sync-2
+COPY --from=builder /shairport-sync-classic /usr/local/bin/shairport-sync-classic
 COPY --from=builder /nqptp/nqptp /usr/local/bin/nqptp
 RUN setcap 'cap_net_bind_service=+ep' /usr/local/bin/nqptp
 COPY docker/run.sh /run.sh

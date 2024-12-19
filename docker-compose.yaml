@@ -3,7 +3,7 @@ services:
   shairport-sync:
     container_name: shairport-sync
     restart: always
-    image: ghcr.io/hifiberry/extension_shairport-sync:4.3.2.4
+    image: ghcr.io/hifiberry/extension_shairport-sync:4.3.5-pw
     #build:
     #  dockerfile: Dockerfile
     network_mode: host
@@ -16,6 +16,7 @@ services:
       - /etc/shairport-sync.conf:/etc/shairport-sync.conf
       - /etc/asound.conf:/etc/asound.conf
       - /run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket
+      - /run/pipewire:/run/pipewire
     group_add:
       - 2001
     cap_add:
